@@ -1,0 +1,36 @@
+# BROKEN: reproduces "Failed to generate PR comment / Resource not accessible by integration".
+#
+# `permissions: {}` zeroes out every scope on GITHUB_TOKEN, including
+# `pull-requests: write`. setup-gradle still builds the Job Summary table with the
+# Build Scan links, then gets a 403 when it tries to POST the comment.
+name: Broken (no permissions)
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+# <-- THIS is what breaks the PR comment.
+permissions: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Setup java
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'zulu'
+          java-version: 21
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          add-job-summary-as-pr-comment: 'always'
+
+      - name: Execute hello
+        run: ./gradlew hello
