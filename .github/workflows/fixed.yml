@@ -37,4 +37,4 @@ jobs:
           add-job-summary-as-pr-comment: 'always'
 
       - name: Execute hello
-        run: ./gradlew hello
+        run: ./gradlew hello -Pfail=true
