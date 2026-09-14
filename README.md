@@ -106,3 +106,13 @@ Same caveat for scans, if you publish to your own Develocity instance: secrets
 aren't exposed to fork PRs, so an `onlyIf { it.isAuthenticated }` guard will skip
 publishing there entirely. (This repo sidesteps that by using the free
 `scans.gradle.com` service, which needs no access key.)
+
+## Demo PRs
+
+Three PRs are kept open against this repo as live evidence:
+
+- a green build (this one)
+- a red build forced from the workflow step (`-Pfail=true`)
+- a red build caused by a source change
+
+Cross them with the three workflows to see which combinations produce a comment.
