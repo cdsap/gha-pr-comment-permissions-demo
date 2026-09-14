@@ -1,0 +1,47 @@
+# INHERITED: no `permissions:` block anywhere — the shape most real workflows have.
+#
+# Mirrors autonomousapps/dependency-analysis-gradle-plugin@1ee22a9 (.github/workflows/test.yml),
+# where the Build Scan PR comment works: SHA-pinned setup-gradle, 'on-failure', and
+# no permissions block at all.
+#
+# With nothing declared, GITHUB_TOKEN falls back to the repository's
+# Settings -> Actions -> General -> "Workflow permissions" default. So whether the
+# comment posts is decided outside the YAML:
+#
+#   "Read and write permissions" -> comment posts (what that repo has)
+#   "Read repository contents ... permission" -> 403, same symptom as broken.yml
+#
+# Check it with:
+#   gh api repos/OWNER/REPO/actions/permissions/workflow
+name: Inherited (no permissions block)
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+# No `permissions:` key, at workflow level or job level. On purpose.
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Setup java
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'zulu'
+          java-version: 21
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e # 6.1.0
+        with:
+          # 'on-failure', like the upstream workflow: a green PR gets no comment
+          # by design, which is what makes a real breakage so easy to miss.
+          add-job-summary-as-pr-comment: 'on-failure'
+
+      - name: Execute hello
+        run: ./gradlew hello
